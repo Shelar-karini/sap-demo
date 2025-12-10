@@ -1,0 +1,33 @@
+{
+  "name": "hana-odata-service",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "cds-serve",
+    "build": "cds build"
+  },
+  "dependencies": {
+    "@sap/cds": "^8",
+    "@sap/cds-dk": "^8",
+    "express": "^4",
+    "hdb": "^0.19.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "cds": {
+    "requires": {
+      "db": {
+        "kind": "hana",
+        "credentials": {
+          "host": "7eeffaf7-c8ab-4f91-b7df-04fbf0349d1c.hna0.prod-us10.hanacloud.ondemand.com",
+          "port": "443",
+          "user": "DBADMIN",
+          "password": "Aditya@285",
+          "schema": "PROCURE_TO_PAY",
+          "encrypt": true,
+          "sslValidateCertificate": false
+        }
+      }
+    }
+  }
+}
