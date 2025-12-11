@@ -1,76 +1,76 @@
 using { procure.to.pay as db } from '../db/schema';
 
 service ProcurementService {
-  entity Vendors as projection on db.VENDORS {
-    VENDOR_ID as VendorId,
-    VENDOR_NAME as VendorName,
-    EMAIL as Email,
-    TAX_ID as TaxId
+  entity vendors as projection on db.VENDORS {
+    VENDOR_ID as vendorid,
+    VENDOR_NAME as vendorname,
+    EMAIL as email,
+    TAX_ID as taxid
   };
   
-  entity Materials as projection on db.MATERIALS {
-    MATERIAL_CODE as MaterialCode,
-    DESCRIPTION as Description,
-    MATERIAL_GROUP as MaterialGroup,
-    MATERIAL_TYPE as MaterialType,
-    UNIT_OF_MEASURE as UnitOfMeasure
+  entity materials as projection on db.MATERIALS {
+    MATERIAL_CODE as materialcode,
+    DESCRIPTION as description,
+    MATERIAL_GROUP as materialgroup,
+    MATERIAL_TYPE as materialtype,
+    UNIT_OF_MEASURE as unitofmeasure
   };
   
-  entity PurchaseOrders as projection on db.PURCHASE_ORDERS {
-    PO_NUMBER as PoNumber,
-    VENDOR_ID as VendorId,
-    PO_DATE as PoDate,
-    TOTAL_AMOUNT as TotalAmount,
-    CURRENCY as Currency,
-    STATUS as Status
+  entity purchaseorders as projection on db.PURCHASE_ORDERS {
+    PO_NUMBER as ponumber,
+    VENDOR_ID as vendorid,
+    PO_DATE as podate,
+    TOTAL_AMOUNT as totalamount,
+    CURRENCY as currency,
+    STATUS as status
   };
   
-  entity POLines as projection on db.PO_LINE_ITEMS {
-    PO_NUMBER as PoNumber,
-    LINE_ITEM_NUMBER as LineItemNumber,
-    MATERIAL_CODE as MaterialCode,
-    QUANTITY as Quantity,
-    UNIT_PRICE as UnitPrice,
-    TOTAL_PRICE as TotalPrice
+  entity polines as projection on db.PO_LINE_ITEMS {
+    PO_NUMBER as ponumber,
+    LINE_ITEM_NUMBER as lineitemnumber,
+    MATERIAL_CODE as materialcode,
+    QUANTITY as quantity,
+    UNIT_PRICE as unitprice,
+    TOTAL_PRICE as totalprice
   };
   
-  entity GoodsReceipts as projection on db.GOODS_RECEIPTS {
-    GR_NUMBER as GrNumber,
-    PO_NUMBER as PoNumber,
-    GR_DATE as GrDate,
-    RECEIVED_BY as ReceivedBy,
-    STATUS as Status
+  entity goodsreceipts as projection on db.GOODS_RECEIPTS {
+    GR_NUMBER as grnumber,
+    PO_NUMBER as ponumber,
+    GR_DATE as grdate,
+    RECEIVED_BY as receivedby,
+    STATUS as status
   };
   
-  entity GRLines as projection on db.GR_LINE_ITEMS {
-    GR_NUMBER as GrNumber,
-    LINE_NUMBER as LineNumber,
-    PO_LINE_NUMBER as PoLineNumber,
-    MATERIAL_CODE as MaterialCode,
-    QUANTITY_RECEIVED as QuantityReceived,
-    QUANTITY_ACCEPTED as QuantityAccepted,
-    QUANTITY_REJECTED as QuantityRejected
+  entity grlines as projection on db.GR_LINE_ITEMS {
+    GR_NUMBER as grnumber,
+    LINE_NUMBER as linenumber,
+    PO_LINE_NUMBER as polinenumber,
+    MATERIAL_CODE as materialcode,
+    QUANTITY_RECEIVED as quantityreceived,
+    QUANTITY_ACCEPTED as quantityaccepted,
+    QUANTITY_REJECTED as quantityrejected
   };
   
-  entity VendorInvoices as projection on db.VENDOR_INVOICES {
-    INVOICE_ID as InvoiceId,
-    VENDOR_ID as VendorId,
-    PO_NUMBER as PoNumber,
-    INVOICE_DATE as InvoiceDate,
-    INVOICE_AMOUNT as InvoiceAmount,
-    CURRENCY as Currency,
-    MATCH_STATUS as MatchStatus,
-    CREATED_AT as CreatedAt
+  entity vendorinvoices as projection on db.VENDOR_INVOICES {
+    INVOICE_ID as invoiceid,
+    VENDOR_ID as vendorid,
+    PO_NUMBER as ponumber,
+    INVOICE_DATE as invoicedate,
+    INVOICE_AMOUNT as invoiceamount,
+    CURRENCY as currency,
+    MATCH_STATUS as matchstatus,
+    CREATED_AT as createdat
   };
   
-  entity InvoiceLineItems as projection on db.INVOICE_LINE_ITEMS {
-    INVOICE_ID as InvoiceId,
-    LINE_NUMBER as LineNumber,
-    MATERIAL_CODE as MaterialCode,
-    DESCRIPTION as Description,
-    QUANTITY as Quantity,
-    UNIT_PRICE as UnitPrice,
-    TOTAL_PRICE as TotalPrice,
-    MATCHED_PO_LINE as MatchedPoLine
+  entity invoicelineitems as projection on db.INVOICE_LINE_ITEMS {
+    INVOICE_ID as invoiceid,
+    LINE_NUMBER as linenumber,
+    MATERIAL_CODE as materialcode,
+    DESCRIPTION as description,
+    QUANTITY as quantity,
+    UNIT_PRICE as unitprice,
+    TOTAL_PRICE as totalprice,
+    MATCHED_PO_LINE as matchedpoline
   };
 }
