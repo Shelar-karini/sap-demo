@@ -3,9 +3,51 @@ const cds = require('@sap/cds');
 module.exports = cds.service.impl(async function() {
   const db = await cds.connect.to('db');
   
+  // Helper function to extract WHERE clause from CDS query
+  const extractWhereClause = (req, columnMap) => {
+    let whereClause = '';
+    const params = [];
+    
+    if (req.query.SELECT && req.query.SELECT.where) {
+      const where = req.query.SELECT.where;
+      
+      for (let i = 0; i < where.length; i++) {
+        const clause = where[i];
+        
+        if (clause.ref && clause.ref[0]) {
+          const odataColumn = clause.ref[0].toLowerCase();
+          const dbColumn = columnMap[odataColumn] || clause.ref[0];
+          
+          const operator = where[i + 1];
+          const value = where[i + 2];
+          
+          if (operator === '=' && value && value.val !== undefined) {
+            whereClause = ` WHERE "${dbColumn}" = ?`;
+            params.push(value.val);
+            break;
+          }
+        }
+      }
+    }
+    
+    return { whereClause, params };
+  };
+  
   // ============ VENDORS ============
   this.on('READ', 'vendors', async (req) => {
-    const result = await db.run('SELECT * FROM "PROCURE_TO_PAY"."VENDORS"');
+    const columnMap = {
+      'vendorid': 'VENDOR_ID',
+      'vendorname': 'VENDOR_NAME',
+      'email': 'EMAIL',
+      'taxid': 'TAX_ID'
+    };
+    
+    const { whereClause, params } = extractWhereClause(req, columnMap);
+    const sql = `SELECT * FROM "PROCURE_TO_PAY"."VENDORS"${whereClause}`;
+    
+    console.log('Vendors SQL:', sql, 'Params:', params);
+    
+    const result = await db.run(sql, params);
     return result.map(row => ({
       vendorid: row.VENDOR_ID,
       vendorname: row.VENDOR_NAME,
@@ -38,7 +80,20 @@ module.exports = cds.service.impl(async function() {
   
   // ============ MATERIALS ============
   this.on('READ', 'materials', async (req) => {
-    const result = await db.run('SELECT * FROM "PROCURE_TO_PAY"."MATERIALS"');
+    const columnMap = {
+      'materialcode': 'MATERIAL_CODE',
+      'description': 'DESCRIPTION',
+      'materialgroup': 'MATERIAL_GROUP',
+      'materialtype': 'MATERIAL_TYPE',
+      'unitofmeasure': 'UNIT_OF_MEASURE'
+    };
+    
+    const { whereClause, params } = extractWhereClause(req, columnMap);
+    const sql = `SELECT * FROM "PROCURE_TO_PAY"."MATERIALS"${whereClause}`;
+    
+    console.log('Materials SQL:', sql, 'Params:', params);
+    
+    const result = await db.run(sql, params);
     return result.map(row => ({
       materialcode: row.MATERIAL_CODE,
       description: row.DESCRIPTION,
@@ -72,7 +127,21 @@ module.exports = cds.service.impl(async function() {
   
   // ============ PURCHASE_ORDERS ============
   this.on('READ', 'purchaseorders', async (req) => {
-    const result = await db.run('SELECT * FROM "PROCURE_TO_PAY"."PURCHASE_ORDERS"');
+    const columnMap = {
+      'ponumber': 'PO_NUMBER',
+      'vendorid': 'VENDOR_ID',
+      'podate': 'PO_DATE',
+      'totalamount': 'TOTAL_AMOUNT',
+      'currency': 'CURRENCY',
+      'status': 'STATUS'
+    };
+    
+    const { whereClause, params } = extractWhereClause(req, columnMap);
+    const sql = `SELECT * FROM "PROCURE_TO_PAY"."PURCHASE_ORDERS"${whereClause}`;
+    
+    console.log('PurchaseOrders SQL:', sql, 'Params:', params);
+    
+    const result = await db.run(sql, params);
     return result.map(row => ({
       ponumber: row.PO_NUMBER,
       vendorid: row.VENDOR_ID,
@@ -107,7 +176,21 @@ module.exports = cds.service.impl(async function() {
   
   // ============ POLINES ============
   this.on('READ', 'polines', async (req) => {
-    const result = await db.run('SELECT * FROM "PROCURE_TO_PAY"."PO_LINE_ITEMS"');
+    const columnMap = {
+      'ponumber': 'PO_NUMBER',
+      'lineitemnumber': 'LINE_ITEM_NUMBER',
+      'materialcode': 'MATERIAL_CODE',
+      'quantity': 'QUANTITY',
+      'unitprice': 'UNIT_PRICE',
+      'totalprice': 'TOTAL_PRICE'
+    };
+    
+    const { whereClause, params } = extractWhereClause(req, columnMap);
+    const sql = `SELECT * FROM "PROCURE_TO_PAY"."PO_LINE_ITEMS"${whereClause}`;
+    
+    console.log('POLines SQL:', sql, 'Params:', params);
+    
+    const result = await db.run(sql, params);
     return result.map(row => ({
       ponumber: row.PO_NUMBER,
       lineitemnumber: row.LINE_ITEM_NUMBER,
@@ -143,7 +226,20 @@ module.exports = cds.service.impl(async function() {
   
   // ============ GOODS_RECEIPTS ============
   this.on('READ', 'goodsreceipts', async (req) => {
-    const result = await db.run('SELECT * FROM "PROCURE_TO_PAY"."GOODS_RECEIPTS"');
+    const columnMap = {
+      'grnumber': 'GR_NUMBER',
+      'ponumber': 'PO_NUMBER',
+      'grdate': 'GR_DATE',
+      'receivedby': 'RECEIVED_BY',
+      'status': 'STATUS'
+    };
+    
+    const { whereClause, params } = extractWhereClause(req, columnMap);
+    const sql = `SELECT * FROM "PROCURE_TO_PAY"."GOODS_RECEIPTS"${whereClause}`;
+    
+    console.log('GoodsReceipts SQL:', sql, 'Params:', params);
+    
+    const result = await db.run(sql, params);
     return result.map(row => ({
       grnumber: row.GR_NUMBER,
       ponumber: row.PO_NUMBER,
@@ -177,7 +273,22 @@ module.exports = cds.service.impl(async function() {
   
   // ============ GRLINES ============
   this.on('READ', 'grlines', async (req) => {
-    const result = await db.run('SELECT * FROM "PROCURE_TO_PAY"."GR_LINE_ITEMS"');
+    const columnMap = {
+      'grnumber': 'GR_NUMBER',
+      'linenumber': 'LINE_NUMBER',
+      'polinenumber': 'PO_LINE_NUMBER',
+      'materialcode': 'MATERIAL_CODE',
+      'quantityreceived': 'QUANTITY_RECEIVED',
+      'quantityaccepted': 'QUANTITY_ACCEPTED',
+      'quantityrejected': 'QUANTITY_REJECTED'
+    };
+    
+    const { whereClause, params } = extractWhereClause(req, columnMap);
+    const sql = `SELECT * FROM "PROCURE_TO_PAY"."GR_LINE_ITEMS"${whereClause}`;
+    
+    console.log('GRLines SQL:', sql, 'Params:', params);
+    
+    const result = await db.run(sql, params);
     return result.map(row => ({
       grnumber: row.GR_NUMBER,
       linenumber: row.LINE_NUMBER,
@@ -214,7 +325,23 @@ module.exports = cds.service.impl(async function() {
   
   // ============ VENDOR_INVOICES ============
   this.on('READ', 'vendorinvoices', async (req) => {
-    const result = await db.run('SELECT * FROM "PROCURE_TO_PAY"."VENDOR_INVOICES"');
+    const columnMap = {
+      'invoiceid': 'INVOICE_ID',
+      'vendorid': 'VENDOR_ID',
+      'ponumber': 'PO_NUMBER',
+      'invoicedate': 'INVOICE_DATE',
+      'invoiceamount': 'INVOICE_AMOUNT',
+      'currency': 'CURRENCY',
+      'matchstatus': 'MATCH_STATUS',
+      'createdat': 'CREATED_AT'
+    };
+    
+    const { whereClause, params } = extractWhereClause(req, columnMap);
+    const sql = `SELECT * FROM "PROCURE_TO_PAY"."VENDOR_INVOICES"${whereClause}`;
+    
+    console.log('VendorInvoices SQL:', sql, 'Params:', params);
+    
+    const result = await db.run(sql, params);
     return result.map(row => ({
       invoiceid: row.INVOICE_ID,
       vendorid: row.VENDOR_ID,
@@ -251,7 +378,23 @@ module.exports = cds.service.impl(async function() {
   
   // ============ INVOICE_LINE_ITEMS ============
   this.on('READ', 'invoicelineitems', async (req) => {
-    const result = await db.run('SELECT * FROM "PROCURE_TO_PAY"."INVOICE_LINE_ITEMS"');
+    const columnMap = {
+      'invoiceid': 'INVOICE_ID',
+      'linenumber': 'LINE_NUMBER',
+      'materialcode': 'MATERIAL_CODE',
+      'description': 'DESCRIPTION',
+      'quantity': 'QUANTITY',
+      'unitprice': 'UNIT_PRICE',
+      'totalprice': 'TOTAL_PRICE',
+      'matchedpoline': 'MATCHED_PO_LINE'
+    };
+    
+    const { whereClause, params } = extractWhereClause(req, columnMap);
+    const sql = `SELECT * FROM "PROCURE_TO_PAY"."INVOICE_LINE_ITEMS"${whereClause}`;
+    
+    console.log('InvoiceLineItems SQL:', sql, 'Params:', params);
+    
+    const result = await db.run(sql, params);
     return result.map(row => ({
       invoiceid: row.INVOICE_ID,
       linenumber: row.LINE_NUMBER,
